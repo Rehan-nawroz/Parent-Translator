@@ -1,0 +1,21 @@
+# Dependencies and build output
+node_modules/
+.next/
+out/
+build/
+coverage/
+test-results/
+playwright-report/
+
+# Generated files
+next-env.d.ts
+package-lock.json
+*.tsbuildinfo
+
+# Hand-maintained source-of-truth documentation
+docs/
+
+# Local secrets
+.env
+.env.*
+!.env.example
