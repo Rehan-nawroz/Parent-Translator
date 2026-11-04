@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { CitationBadge } from "@/components/results/CitationBadge";
 import { buttonClasses } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { getLanguageOption } from "@/lib/config/languages";
 import type { DeadlineDateKind } from "@/lib/contracts/analysis";
 import { useSession } from "@/lib/session/session-store";
 import { formatIsoDate } from "@/lib/utils/dates";
@@ -54,16 +55,22 @@ export function TimelineView({ remaining }: { remaining: number }) {
   return (
     <ul className="space-y-3">
       {timeline.map((entry) => (
-        <li key={entry.id} className="rounded-xl border border-line bg-obsidian/60 p-4">
+        <li
+          key={entry.id}
+          dir={getLanguageOption(entry.language).direction}
+          className="rounded-xl border border-line bg-obsidian/60 p-4"
+        >
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-start gap-3">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-crimson/10 text-crimson">
                 <CalendarDays className="h-4 w-4" aria-hidden="true" />
               </span>
               <div>
-                <p className="text-sm font-semibold text-white">{entry.title}</p>
+                <p lang={entry.language} className="text-sm font-semibold text-white">
+                  {entry.title}
+                </p>
                 <p className="mt-1 text-xs text-muted">
-                  {entry.date ? formatIsoDate(entry.date) : entry.dateDisplay} ·{" "}
+                  {entry.date ? formatIsoDate(entry.date, entry.language) : entry.dateDisplay} ·{" "}
                   {KIND_LABELS[entry.dateKind]}
                 </p>
                 <p className="mt-1 text-[11px] text-muted">From {entry.documentName}</p>
