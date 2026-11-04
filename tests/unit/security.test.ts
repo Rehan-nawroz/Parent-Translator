@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
+import { getLanguageOption } from "@/lib/config/languages";
 import { checkRateLimit, resetRateLimits } from "@/lib/security/request-limits";
 import { sanitizeResourceUrl, sanitizeText, stripJsonFence } from "@/lib/security/sanitize";
+import { formatIsoDate } from "@/lib/utils/dates";
 import { createRequestId } from "@/lib/utils/ids";
 import { maskEmail, normalizeWhitespace } from "@/lib/utils/text";
 
@@ -59,5 +61,16 @@ describe("display helpers", () => {
     expect(normalizeWhitespace("  IEP   meeting on March 12, 2026 \n\n\n")).toBe(
       "IEP meeting on March 12, 2026",
     );
+  });
+
+  it("formats dates in the selected language without shifting the day", () => {
+    expect(formatIsoDate("2026-03-06", "en-US")).toBe("March 6, 2026");
+    expect(formatIsoDate("2026-03-06", "es")).toContain("marzo");
+    expect(formatIsoDate("2026-03-06", "ar")).toContain("مارس");
+  });
+
+  it("marks Arabic text as right-to-left", () => {
+    expect(getLanguageOption("ar").direction).toBe("rtl");
+    expect(getLanguageOption("en").direction).toBe("ltr");
   });
 });
