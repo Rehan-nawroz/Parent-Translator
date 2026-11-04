@@ -81,6 +81,7 @@ export function ResultWorkspace({ remaining, limit }: { remaining: number; limit
       <AnalysisView
         analysis={currentDocument.analysis}
         documentName={currentDocument.displayName}
+        language={currentDocument.language}
         languageLabel={getLanguageOption(currentDocument.language).nativeLabel}
       />
     </div>
