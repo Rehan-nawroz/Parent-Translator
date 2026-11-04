@@ -10,8 +10,9 @@ export default function TermsPage() {
       <p className="mt-4 text-sm text-muted">Terms version 2026-11-01</p>
 
       <div className="mt-8 rounded-xl border border-crimson/30 bg-crimson/8 px-5 py-4 text-sm leading-relaxed text-ember">
-        <strong className="text-white">Placeholder notice:</strong> this is draft product copy. Final legal text must be reviewed and approved by the product owner
-        before any public launch.
+        <strong className="text-white">Placeholder notice:</strong> this is draft product copy.
+        Final legal text must be reviewed and approved by the product owner before any public
+        launch.
       </div>
 
       <div className="prose-dark mt-8">
@@ -41,8 +42,8 @@ export default function TermsPage() {
         <h2>Your account and the demo limit</h2>
         <p>
           You need an account to analyze a document. Each account receives three completed analyses.
-          Invalid uploads do not consume a credit, and a temporary provider
-          failure restores the reservation. There is no payment, upgrade, or public reset flow.
+          Invalid uploads do not consume a credit, and a temporary provider failure restores the
+          reservation. There is no payment, upgrade, or public reset flow.
         </p>
 
         <h2>Acceptable use</h2>
