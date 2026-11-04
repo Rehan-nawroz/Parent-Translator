@@ -12,6 +12,9 @@ const STAGES = [
 export function UploadProgress({ stage }: { stage: number }) {
   return (
     <div className="rounded-xl border border-crimson/25 bg-crimson/5 p-4">
+      <p className="sr-only" role="status" aria-live="polite">
+        {STAGES[Math.min(stage, STAGES.length - 1)]}
+      </p>
       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-ember">
         Working on your document
       </p>
@@ -34,7 +37,10 @@ export function UploadProgress({ stage }: { stage: number }) {
                 {done ? (
                   <Check className="h-3 w-3" aria-hidden="true" />
                 ) : active ? (
-                  <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />
+                  <Loader2
+                    className="h-3 w-3 animate-spin motion-reduce:animate-none"
+                    aria-hidden="true"
+                  />
                 ) : (
                   <span className="h-1 w-1 rounded-full bg-current" aria-hidden="true" />
                 )}
