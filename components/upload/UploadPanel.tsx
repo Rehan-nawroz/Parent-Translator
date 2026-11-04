@@ -109,7 +109,9 @@ export function UploadPanel({ remaining, limit }: { remaining: number; limit: nu
           creditNote:
             code === "PROVIDER_UNAVAILABLE" || code === "INVALID_AI_RESPONSE"
               ? "Your analysis credit was restored, so you can try again."
-              : undefined,
+              : code === "RATE_LIMITED"
+                ? "No analysis credit was used. Please wait a moment and try again."
+                : undefined,
         });
         return;
       }
@@ -218,8 +220,7 @@ export function UploadPanel({ remaining, limit }: { remaining: number; limit: nu
             />
           </div>
           <p className="mt-3 text-xs leading-relaxed text-muted">
-            Three analyses per account is a temporary limit. No payment or reset flow is
-            offered.
+            Three analyses per account is a temporary limit. No payment or reset flow is offered.
           </p>
         </Card>
 
