@@ -94,7 +94,7 @@ export function ProtectedNavigation({
 
       <nav
         aria-label="Authenticated mobile"
-        className="flex gap-1 overflow-x-auto border-t border-line px-3 py-2 lg:hidden"
+        className="flex flex-wrap gap-1 border-t border-line px-3 py-2 lg:hidden"
       >
         {LINKS.map((link) => (
           <Link
