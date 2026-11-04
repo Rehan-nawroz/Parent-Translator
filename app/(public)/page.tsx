@@ -209,7 +209,7 @@ export default function LandingPage() {
             {
               icon: ShieldCheck,
               title: "Private by default",
-              body: "Documents are read for one request, then dropped. No history, no training data.",
+              body: "Documents are read for one request, then dropped. No document history, and we do not use it for training.",
             },
             {
               icon: ScanText,
