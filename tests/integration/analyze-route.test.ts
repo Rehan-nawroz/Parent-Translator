@@ -10,6 +10,8 @@ const mocks = vi.hoisted(() => ({
   extractDocument: vi.fn(),
   requestAnalysis: vi.fn(),
   parseAnalysisResponse: vi.fn(),
+  checkRateLimit: vi.fn(),
+  readConsent: vi.fn(),
 }));
 
 vi.mock("@/lib/supabase/auth", () => ({ getCurrentUser: mocks.getCurrentUser }));
@@ -22,6 +24,8 @@ vi.mock("@/lib/documents/validate-upload", () => ({ validateUpload: mocks.valida
 vi.mock("@/lib/documents/extract", () => ({ extractDocument: mocks.extractDocument }));
 vi.mock("@/lib/ai/service", () => ({ requestAnalysis: mocks.requestAnalysis }));
 vi.mock("@/lib/ai/parse-response", () => ({ parseAnalysisResponse: mocks.parseAnalysisResponse }));
+vi.mock("@/lib/security/request-limits", () => ({ checkRateLimit: mocks.checkRateLimit }));
+vi.mock("@/lib/supabase/consent", () => ({ readConsent: mocks.readConsent }));
 
 import { POST } from "@/app/api/analyze/route";
 import { AiServiceError } from "@/lib/ai/errors";
@@ -41,10 +45,11 @@ const source: SourceDocument = {
   charCount: 44,
 };
 
-function makeRequest(fields: { file?: boolean; language?: string }): NextRequest {
+function makeRequest(fields: { file?: boolean; language?: string; userId?: string }): NextRequest {
   const form = new FormData();
   if (fields.file) form.append("file", new File(["hello"], "notice.txt", { type: "text/plain" }));
   if (fields.language) form.append("language", fields.language);
+  if (fields.userId) form.append("userId", fields.userId);
   return new NextRequest("http://localhost/api/analyze", { method: "POST", body: form });
 }
 
@@ -62,6 +67,12 @@ describe("POST /api/analyze", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.getCurrentUser.mockResolvedValue({ id: "user-1", email: null });
+    mocks.checkRateLimit.mockReturnValue({ allowed: true, retryAfterSeconds: 0 });
+    mocks.readConsent.mockResolvedValue({
+      recorded: true,
+      termsVersion: "2026-11-01",
+      privacyVersion: "2026-11-01",
+    });
     mocks.validateUpload.mockResolvedValue({
       ok: true,
       upload: {
@@ -91,10 +102,40 @@ describe("POST /api/analyze", () => {
     expect(mocks.reserveAnalysis).not.toHaveBeenCalled();
   });
 
+  it("requires recorded policy consent before reserving a credit", async () => {
+    mocks.readConsent.mockResolvedValue({
+      recorded: false,
+      termsVersion: null,
+      privacyVersion: null,
+    });
+
+    const response = await POST(makeRequest({ file: true, language: "en" }));
+    expect(response.status).toBe(403);
+    expect((await readBody(response)).error?.code).toBe("CONSENT_REQUIRED");
+    expect(mocks.reserveAnalysis).not.toHaveBeenCalled();
+  });
+
+  it("rejects a rate-limited request before reserving a credit", async () => {
+    mocks.checkRateLimit.mockReturnValue({ allowed: false, retryAfterSeconds: 30 });
+
+    const response = await POST(makeRequest({ file: true, language: "en" }));
+    expect(response.status).toBe(429);
+    expect(response.headers.get("Retry-After")).toBe("30");
+    expect((await readBody(response)).error?.code).toBe("RATE_LIMITED");
+    expect(mocks.reserveAnalysis).not.toHaveBeenCalled();
+  });
+
   it("rejects a missing language", async () => {
     const response = await POST(makeRequest({ file: true }));
     expect(response.status).toBe(400);
     expect((await readBody(response)).error?.code).toBe("INVALID_LANGUAGE");
+  });
+
+  it("uses the verified session user instead of a client-supplied user id", async () => {
+    const response = await POST(makeRequest({ file: true, language: "en", userId: "attacker" }));
+    expect(response.status).toBe(200);
+    expect(mocks.reserveAnalysis).toHaveBeenCalledWith("user-1");
+    expect(mocks.finalizeAnalysis).toHaveBeenCalledWith("user-1");
   });
 
   it("rejects an invalid upload before reserving a credit", async () => {
