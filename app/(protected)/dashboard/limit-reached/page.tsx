@@ -30,8 +30,8 @@ export default async function LimitReachedPage() {
           {used} of {limit} analyses used
         </h1>
         <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted">
-          Every account gets three document analyses. This is not a payment
-          problem and there is no upgrade or reset flow.
+          Every account gets three document analyses. This is not a payment problem and there is no
+          upgrade or reset flow.
         </p>
 
         <div className="mx-auto mt-6 max-w-sm rounded-xl border border-line bg-ink/40 p-4 text-left">
