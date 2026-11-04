@@ -5,7 +5,7 @@ import type { AnalysisResult } from "./analysis";
 /**
  * Runtime guard for the AI response. Gemini output is untrusted: nothing reaches the UI until
  * it parses through this schema.
- 
+ */
 
 const MAX_TITLE = 200;
 const MAX_SECTION_LABEL = 160;
