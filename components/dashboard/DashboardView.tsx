@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { buttonClasses } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { useSession } from "@/lib/session/session-store";
+import { formatIsoDate } from "@/lib/utils/dates";
 import { maskEmail } from "@/lib/utils/text";
 
 import { UsageIndicator } from "./UsageIndicator";
@@ -24,7 +25,7 @@ export function DashboardView({
   const { documents, setCurrentDocument, timeline } = useSession();
   const empty = documents.length === 0;
   const percent = limit > 0 ? Math.max(0, Math.min(100, (remaining / limit) * 100)) : 0;
-  const shortEmail = email ? maskEmail(email).split("@")[0] : null;
+  const shortEmail = email ? maskEmail(email).split("@")[0]?.slice(0, 5) : null;
 
   return (
     <div className="space-y-6">
@@ -49,8 +50,8 @@ export function DashboardView({
               {remaining} of {limit} analyses remaining
             </p>
             <p className="mt-1 text-xs leading-relaxed text-muted">
-              This three-analysis limit is a temporary rule. Each account starts with
-              three; failed or invalid requests do not use one.
+              This three-analysis limit is a temporary rule. Each account starts with three; failed
+              or invalid requests do not use one.
             </p>
             <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-white/10">
               <div
@@ -160,9 +161,12 @@ export function DashboardView({
                     <CalendarDays className="h-4 w-4" aria-hidden="true" />
                   </span>
                   <div className="min-w-0">
-                    <p className="truncate text-xs font-medium text-white">{entry.title}</p>
+                    <p lang={entry.language} className="truncate text-xs font-medium text-white">
+                      {entry.title}
+                    </p>
                     <p className="truncate text-[11px] text-muted">
-                      {entry.date ?? entry.dateDisplay} · {entry.documentName}
+                      {entry.date ? formatIsoDate(entry.date, entry.language) : entry.dateDisplay} ·{" "}
+                      {entry.documentName}
                     </p>
                   </div>
                 </li>
