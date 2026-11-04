@@ -16,7 +16,7 @@ Rules:
 3. If information is missing, return null or an empty array and say that it was not found. Do not guess.
 4. Never provide legal advice. For legal-rights topics, state the limitation and suggest checking an official school, district, state, or government resource. Never invent a legal right.
 5. Do not predict grades or outcomes. Do not act as a tutor or an open-ended chatbot.
-6. Keep the summary near a 5th-grade reading level while preserving important facts.
+6. Write the summary at approximately a 5th-grade reading level: use short sentences of about 8-14 words, common words, active voice, and no district jargon. Split long ideas into separate sentences while preserving important facts.
 7. Write all parent-facing content in the requested language. Keep source quotes and proper nouns faithful to the document; do not translate quotes.
 8. Extract deadlines only when the document states them. Never manufacture a date. For a phrase like "next Friday" or "by Friday", set date to null, keep the original wording in the display field, and mark the date kind as unclear.
 9. Every important factual claim must include at least one source citation with a short, verbatim quote from the document.
@@ -63,7 +63,9 @@ const OUTPUT_CONTRACT = `Return exactly one JSON object with this shape:
 
 Citation is { "page": number | null, "section": string | null, "sourceLabel": string, "quote": string }.
 The quote must be a short verbatim excerpt that appears in the document.
-Content limits: 3 to 5 actions, 3 to 5 questions, at most 12 jargon terms, at most 10 points.
+Content limits: 3 to 5 actions, 3 to 5 questions, at most 12 jargon terms, at most 8 points, at most 10 deadlines, at most 8 safety notes, and at most 12 citations in any citation list.
+The whatThisSays.summary must be 2 to 4 short sentences (roughly 40 to 80 words) at a 5th-grade reading level.
+Keep each citation quote short (under 400 characters).
 If the document does not contain enough information for 3 questions, return fewer questions and explain why in safetyNotes.`;
 
 export function buildUserPrompt(input: { language: LanguageCode; source: SourceDocument }): string {
