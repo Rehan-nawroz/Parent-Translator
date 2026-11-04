@@ -93,6 +93,11 @@ describe("buildTimeline", () => {
     expect(entries[0]?.documentName).toBe("notice.txt");
   });
 
+  it("keeps the document language so dates can be localized", () => {
+    const arabic = { ...sessionDocument("a", makeAnalysis()), language: "ar" as const };
+    expect(buildTimeline([arabic])[0]?.language).toBe("ar");
+  });
+
   it("keeps an action whose deadline was not stated", () => {
     const analysis = makeAnalysis({
       deadlines: [],
