@@ -1,3 +1,4 @@
+import type { LanguageCode } from "@/lib/config/languages";
 import type { Citation, DeadlineDateKind } from "@/lib/contracts/analysis";
 import { normalizeForComparison } from "@/lib/utils/text";
 
@@ -7,6 +8,7 @@ export type TimelineEntry = {
   id: string;
   documentId: string;
   documentName: string;
+  language: LanguageCode;
   title: string;
   date: string | null;
   dateDisplay: string;
@@ -51,6 +53,7 @@ export function buildTimeline(documents: SessionDocument[]): TimelineEntry[] {
         id: `${document.id}:deadline:${index}`,
         documentId: document.id,
         documentName: deadline.sourceDocumentName || document.displayName,
+        language: document.language,
         title: deadline.title,
         date: deadline.date,
         dateDisplay: deadline.dateDisplay,
@@ -74,6 +77,7 @@ export function buildTimeline(documents: SessionDocument[]): TimelineEntry[] {
         id: `${document.id}:action:${index}`,
         documentId: document.id,
         documentName: document.displayName,
+        language: document.language,
         title: action.action,
         date: null,
         dateDisplay: action.dueDateDisplay ?? "No date found in the document",
