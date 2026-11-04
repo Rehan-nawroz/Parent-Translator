@@ -16,6 +16,7 @@ export const ERROR_CODES = [
   "UNAUTHENTICATED",
   "CONSENT_REQUIRED",
   "QUOTA_EXHAUSTED",
+  "RATE_LIMITED",
   "DOCUMENT_UNREADABLE",
   "PROVIDER_UNAVAILABLE",
   "INVALID_AI_RESPONSE",
@@ -35,6 +36,7 @@ const ERROR_STATUS: Record<ErrorCode, number> = {
   UNSUPPORTED_FILE: 415,
   DOCUMENT_UNREADABLE: 422,
   QUOTA_EXHAUSTED: 429,
+  RATE_LIMITED: 429,
   INVALID_AI_RESPONSE: 502,
   PROVIDER_UNAVAILABLE: 503,
   INTERNAL_ERROR: 500,
@@ -51,6 +53,7 @@ const ERROR_MESSAGE: Record<ErrorCode, string> = {
   UNAUTHENTICATED: "Please sign in to explain a document.",
   CONSENT_REQUIRED: "Please accept the Terms and Privacy Policy to continue.",
   QUOTA_EXHAUSTED: "You have used all three analyses available for this demo.",
+  RATE_LIMITED: "Too many requests in a short time. Please wait a moment and try again.",
   DOCUMENT_UNREADABLE:
     "We could not read any text from that document. Try a clearer copy or a different file.",
   PROVIDER_UNAVAILABLE:
