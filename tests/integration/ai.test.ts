@@ -97,7 +97,12 @@ describe("prompt", () => {
     expect(SYSTEM_INSTRUCTION).toContain("5th-grade");
     expect(SYSTEM_INSTRUCTION).toContain("Never manufacture a date");
     expect(SYSTEM_INSTRUCTION).toContain("Return only the requested JSON");
+    expect(SYSTEM_INSTRUCTION).toContain("Never claim a child is failing");
     expect(SYSTEM_INSTRUCTION).toContain("whatThisSays");
+
+    const prompt = buildUserPrompt({ language: "en", source });
+    expect(prompt).toContain("at most 8 points");
+    expect(prompt).toContain("at most 12 citations");
   });
 
   it("marks the document as untrusted and names the requested language", () => {
