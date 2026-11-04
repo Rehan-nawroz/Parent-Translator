@@ -15,8 +15,10 @@ import { disposeSource } from "@/lib/documents/cleanup";
 import { extractDocument } from "@/lib/documents/extract";
 import type { SourceDocument } from "@/lib/documents/types";
 import { validateUpload } from "@/lib/documents/validate-upload";
+import { checkRateLimit } from "@/lib/security/request-limits";
 import { logSafeEvent } from "@/lib/security/safe-logging";
 import { getCurrentUser } from "@/lib/supabase/auth";
+import { readConsent } from "@/lib/supabase/consent";
 import { finalizeAnalysis, releaseAnalysis, reserveAnalysis } from "@/lib/supabase/usage";
 import { createRequestId } from "@/lib/utils/ids";
 
@@ -42,18 +44,28 @@ export async function POST(request: NextRequest) {
   let completed = false;
   let source: SourceDocument | null = null;
 
-  const fail = (code: ErrorCode) => {
+  const fail = (code: ErrorCode, headers: Record<string, string> = {}) => {
     state.errorCode = code;
     state.status = statusForErrorCode(code);
     return NextResponse.json(createAnalyzeErrorResponse(code, requestId), {
       status: state.status,
-      headers: NO_STORE_HEADERS,
+      headers: { ...NO_STORE_HEADERS, ...headers },
     });
   };
 
   try {
     const user = await getCurrentUser();
     if (!user) return fail("UNAUTHENTICATED");
+
+    // Per-user throttle for the demo. The three-analysis quota remains the hard product limit;
+    // this only slows repeated invalid or expensive requests before work begins.
+    const rate = checkRateLimit(`analyze:${user.id}`, { limit: 10, windowMs: 60_000 });
+    if (!rate.allowed) {
+      return fail("RATE_LIMITED", { "Retry-After": String(rate.retryAfterSeconds) });
+    }
+
+    const consent = await readConsent(user.id);
+    if (!consent?.recorded) return fail("CONSENT_REQUIRED");
 
     const declaredLength = Number(request.headers.get("content-length") ?? "0");
     if (Number.isFinite(declaredLength) && declaredLength > MAX_REQUEST_BYTES) {
