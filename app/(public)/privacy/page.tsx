@@ -15,8 +15,8 @@ export default function PrivacyPage() {
         <p className="text-sm leading-relaxed text-mist/90">
           <strong className="text-white">The short version:</strong> your document is read for one
           request and is not saved. Results live in your browser session until you clear them. The
-          only persistent records are your account email, policy acceptance, and how many analyses
-          you have used.
+          only product records we keep are your account email, policy acceptance, and how many
+          analyses you have used.
         </p>
       </Card>
 
@@ -46,7 +46,7 @@ export default function PrivacyPage() {
         <h2>What Supabase stores</h2>
         <p>
           Authentication is handled by Supabase. The project stores the minimum metadata needed to
-          run the demo:
+          run the service:
         </p>
         <ul>
           <li>Your account identity (email address and Supabase user ID).</li>
@@ -84,9 +84,9 @@ export default function PrivacyPage() {
 
         <h2>Limits</h2>
         <p>
-          This notice describes a demonstration, not a production service. It is written
-          to be accurate about the current implementation; it is not legal advice. Final legal
-          review is required before any public launch.
+          This notice describes a demonstration, not a production service. It is written to be
+          accurate about the current implementation; it is not legal advice. Final legal review is
+          required before any public launch.
         </p>
       </div>
 
