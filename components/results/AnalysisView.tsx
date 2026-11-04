@@ -7,6 +7,7 @@ import { JargonPopover } from "@/components/jargon/JargonPopover";
 import { JargonTerm } from "@/components/jargon/JargonTerm";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { getLanguageOption, type LanguageCode } from "@/lib/config/languages";
 import type {
   ActionDeadlineStatus,
   AnalysisResult,
@@ -79,12 +80,15 @@ function SectionCard({
 export function AnalysisView({
   analysis,
   documentName,
+  language,
   languageLabel,
 }: {
   analysis: AnalysisResult;
   documentName: string;
+  language: LanguageCode;
   languageLabel: string;
 }) {
+  const direction = getLanguageOption(language).direction;
   const [activeJargon, setActiveJargon] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -101,7 +105,7 @@ export function AnalysisView({
   }
 
   return (
-    <div className="mt-6 space-y-4">
+    <div className="mt-6 space-y-4" dir={direction}>
       <Card className="rounded-card p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -129,7 +133,9 @@ export function AnalysisView({
         title="What this says"
         subtitle="A plain-language summary of this document"
       >
-        <p className="text-[15px] leading-relaxed text-mist/90">{analysis.whatThisSays.summary}</p>
+        <p lang={language} className="text-[15px] leading-relaxed text-mist/90">
+          {analysis.whatThisSays.summary}
+        </p>
         <CitationList citations={analysis.whatThisSays.citations} />
       </SectionCard>
 
@@ -147,7 +153,9 @@ export function AnalysisView({
               <span className="rounded-full border border-line bg-white/5 px-2 py-0.5 text-[10px] font-medium text-muted">
                 {CERTAINTY_LABELS[point.certainty]}
               </span>
-              <p className="mt-2 text-sm leading-relaxed text-mist/85">{point.text}</p>
+              <p lang={language} className="mt-2 text-sm leading-relaxed text-mist/85">
+                {point.text}
+              </p>
               <CitationList citations={point.citations} />
             </li>
           ))}
@@ -160,7 +168,9 @@ export function AnalysisView({
             </p>
             <ul className="mt-1.5 list-disc space-y-1 pl-4 text-xs leading-relaxed text-amber-100/85">
               {analysis.whatItMeansForYourChild.uncertaintyNotes.map((note) => (
-                <li key={note}>{note}</li>
+                <li key={note} lang={language}>
+                  {note}
+                </li>
               ))}
             </ul>
           </div>
@@ -192,7 +202,9 @@ export function AnalysisView({
                     <span className="text-[11px] text-muted">{action.dueDateDisplay}</span>
                   )}
                 </div>
-                <p className="mt-2 text-sm font-medium text-white">{action.action}</p>
+                <p lang={language} className="mt-2 text-sm font-medium text-white">
+                  {action.action}
+                </p>
                 <p className="mt-1 text-xs text-muted">
                   {action.responsibleParty
                     ? `Responsible: ${action.responsibleParty}`
@@ -222,8 +234,12 @@ export function AnalysisView({
                   {index + 1}
                 </span>
                 <div>
-                  <p className="text-sm font-medium text-white">{question.question}</p>
-                  <p className="mt-1 text-xs leading-relaxed text-muted">{question.reason}</p>
+                  <p lang={language} className="text-sm font-medium text-white">
+                    {question.question}
+                  </p>
+                  <p lang={language} className="mt-1 text-xs leading-relaxed text-muted">
+                    {question.reason}
+                  </p>
                   <CitationList citations={question.citations} />
                 </div>
               </div>
@@ -242,7 +258,10 @@ export function AnalysisView({
           <p aria-live="polite" className="sr-only">
             {copied ? "Draft email copied to clipboard." : ""}
           </p>
-          <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-mist/85">
+          <p
+            lang={language}
+            className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-mist/85"
+          >
             {analysis.whatToAskTheSchool.draftEmail}
           </p>
           <p className="mt-3 text-[11px] text-muted">
@@ -270,6 +289,7 @@ export function AnalysisView({
                   <JargonTerm
                     key={`${item.term}-${index}`}
                     term={item.term}
+                    expanded={activeJargon === index}
                     onClick={() => setActiveJargon(index)}
                   />
                 ))}
@@ -294,10 +314,12 @@ export function AnalysisView({
                   key={`${deadline.title}-${index}`}
                   className="rounded-lg border border-line bg-ink/40 px-3 py-2.5"
                 >
-                  <p className="text-xs font-medium text-white">{deadline.title}</p>
+                  <p lang={language} className="text-xs font-medium text-white">
+                    {deadline.title}
+                  </p>
                   <p className="mt-0.5 text-[11px] text-muted">
-                    {deadline.date ? formatIsoDate(deadline.date) : deadline.dateDisplay} ·{" "}
-                    {KIND_LABELS[deadline.dateKind]}
+                    {deadline.date ? formatIsoDate(deadline.date, language) : deadline.dateDisplay}{" "}
+                    · {KIND_LABELS[deadline.dateKind]}
                   </p>
                   <div className="mt-1">
                     <CitationBadge citation={deadline.sourceReference} />
@@ -309,9 +331,9 @@ export function AnalysisView({
         </Card>
       </div>
 
-      <SafetyNotice notes={analysis.safetyNotes} />
+      <SafetyNotice notes={analysis.safetyNotes} language={language} />
 
-      <JargonPopover item={active} onClose={() => setActiveJargon(null)} />
+      <JargonPopover item={active} language={language} onClose={() => setActiveJargon(null)} />
     </div>
   );
 }
